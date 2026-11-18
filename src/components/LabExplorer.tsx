@@ -1,5 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import {
   Check,
   ChevronRight,
@@ -11,10 +13,41 @@ import {
   X,
 } from 'lucide-react';
 import { EngineeringLab, engineeringLabs } from '../data/labs';
+import { TiltCard3D } from './TiltCard3D';
+import { useReducedMotion } from '../hooks/useReducedMotion';
+
+gsap.registerPlugin(ScrollTrigger);
 
 export const LabExplorer: React.FC = () => {
   const [selectedLab, setSelectedLab] = useState<EngineeringLab | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
+  const reducedMotion = useReducedMotion();
+
+  useEffect(() => {
+    if (reducedMotion || !gridRef.current) return;
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        '.lab-card-3d',
+        { opacity: 0, y: 36, rotateX: 12, transformOrigin: '50% 0%' },
+        {
+          opacity: 1,
+          y: 0,
+          rotateX: 0,
+          duration: 0.78,
+          stagger: 0.065,
+          ease: 'power3.out',
+          clearProps: 'transform,opacity',
+          scrollTrigger: {
+            trigger: gridRef.current,
+            start: 'top 86%',
+            once: true,
+          },
+        }
+      );
+    }, gridRef);
+    return () => ctx.revert();
+  }, [reducedMotion]);
 
   useEffect(() => {
     if (!selectedLab) return;
@@ -37,61 +70,65 @@ export const LabExplorer: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Clean 12-Lab Grid (No Category Filter Bar) */}
-      <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+      {/* Clean 12-Lab Grid with Subtle 3D Perspective Entrance & Hover Tilt (No Filter Bar) */}
+      <div
+        ref={gridRef}
+        className="perspective-1200 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3"
+      >
         {engineeringLabs.map((lab) => (
-          <article
-            key={lab.id}
-            className="cr-card group flex flex-col justify-between p-6"
-          >
-            <div>
-              <div className="flex items-center justify-between gap-2">
-                <span className="font-mono text-xs font-semibold tracking-[0.16em] text-[#FF101A]">
-                  {lab.code}
-                </span>
-                <span className="border border-[#351010] bg-[#080808] px-2.5 py-0.5 font-mono text-[10px] tracking-wider text-[#B8B8B8] uppercase">
-                  {lab.progress}
-                </span>
-              </div>
+          <div key={lab.id} className="lab-card-3d">
+            <TiltCard3D className="h-full" maxTilt={5}>
+              <article className="cr-card group flex h-full flex-col justify-between p-6">
+                <div>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="font-mono text-xs font-semibold tracking-[0.16em] text-[#FF101A]">
+                      {lab.code}
+                    </span>
+                    <span className="border border-[#351010] bg-[#080808] px-2.5 py-0.5 font-mono text-[10px] tracking-wider text-[#B8B8B8] uppercase">
+                      {lab.progress}
+                    </span>
+                  </div>
 
-              <h3 className="mt-3 font-display text-lg font-bold text-white">
-                {lab.title}
-              </h3>
+                  <h3 className="mt-3 font-display text-lg font-bold text-white">
+                    {lab.title}
+                  </h3>
 
-              <p className="mt-2 text-sm leading-relaxed text-[#B8B8B8]">
-                {lab.shortDescription}
-              </p>
+                  <p className="mt-2 text-sm leading-relaxed text-[#B8B8B8]">
+                    {lab.shortDescription}
+                  </p>
 
-              <div className="mt-4 flex flex-wrap gap-1.5">
-                {lab.concepts.slice(0, 4).map((concept) => (
-                  <span
-                    key={concept}
-                    className="border border-[#351010] bg-[#080808] px-2 py-0.5 font-mono text-[10px] text-[#B8B8B8]"
+                  <div className="mt-4 flex flex-wrap gap-1.5">
+                    {lab.concepts.slice(0, 4).map((concept) => (
+                      <span
+                        key={concept}
+                        className="border border-[#351010] bg-[#080808] px-2 py-0.5 font-mono text-[10px] text-[#B8B8B8]"
+                      >
+                        {concept}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="mt-5 border-t border-[#351010] pt-4">
+                  <div className="font-mono text-[10px] tracking-[0.14em] text-[#B8B8B8] uppercase">
+                    Learning Objective
+                  </div>
+                  <p className="mt-1 text-xs leading-relaxed text-white/85">
+                    {lab.learningOutcome}
+                  </p>
+
+                  <button
+                    type="button"
+                    onClick={() => setSelectedLab(lab)}
+                    className="mt-4 inline-flex w-full items-center justify-between border border-[#351010] bg-[#080808] px-4 py-2.5 font-mono text-xs font-medium tracking-[0.14em] text-white uppercase transition-all hover:border-[#FF101A] hover:bg-[#FF101A] hover:text-white"
                   >
-                    {concept}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            <div className="mt-5 border-t border-[#351010] pt-4">
-              <div className="font-mono text-[10px] tracking-[0.14em] text-[#B8B8B8] uppercase">
-                Learning Objective
-              </div>
-              <p className="mt-1 text-xs leading-relaxed text-white/85">
-                {lab.learningOutcome}
-              </p>
-
-              <button
-                type="button"
-                onClick={() => setSelectedLab(lab)}
-                className="mt-4 inline-flex w-full items-center justify-between border border-[#351010] bg-[#080808] px-4 py-2.5 font-mono text-xs font-medium tracking-[0.14em] text-white uppercase transition-all hover:border-[#FF101A] hover:bg-[#FF101A] hover:text-white"
-              >
-                <span>View Details</span>
-                <ChevronRight className="h-4 w-4" aria-hidden="true" />
-              </button>
-            </div>
-          </article>
+                    <span>View Details</span>
+                    <ChevronRight className="h-4 w-4" aria-hidden="true" />
+                  </button>
+                </div>
+              </article>
+            </TiltCard3D>
+          </div>
         ))}
       </div>
 

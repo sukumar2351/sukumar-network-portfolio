@@ -1,10 +1,13 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import gsap from 'gsap';
 import { Menu, X } from 'lucide-react';
 import { NavSectionId } from '../hooks/useScrollProgress';
+import { useReducedMotion } from '../hooks/useReducedMotion';
 
 interface NavbarProps {
   activeSection: NavSectionId;
   scrollProgress: number;
+  ready?: boolean;
 }
 
 const NAV_ITEMS: Array<{ label: string; id: NavSectionId; href: string }> = [
@@ -15,8 +18,35 @@ const NAV_ITEMS: Array<{ label: string; id: NavSectionId; href: string }> = [
   { label: 'CONTACT', id: 'contact', href: '#contact' },
 ];
 
-export const Navbar: React.FC<NavbarProps> = ({ activeSection, scrollProgress }) => {
+export const Navbar: React.FC<NavbarProps> = ({
+  activeSection,
+  scrollProgress,
+  ready = true,
+}) => {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const navRef = useRef<HTMLElement>(null);
+  const reducedMotion = useReducedMotion();
+
+  useEffect(() => {
+    if (reducedMotion || !navRef.current || !ready) return;
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        '.nav-item-3d',
+        { y: -12, rotateX: -45, opacity: 0 },
+        {
+          y: 0,
+          rotateX: 0,
+          opacity: 1,
+          duration: 0.65,
+          stagger: 0.06,
+          delay: 0.15,
+          ease: 'power3.out',
+          clearProps: 'transform,opacity',
+        }
+      );
+    }, navRef);
+    return () => ctx.revert();
+  }, [ready, reducedMotion]);
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, id: NavSectionId) => {
     e.preventDefault();
@@ -28,23 +58,24 @@ export const Navbar: React.FC<NavbarProps> = ({ activeSection, scrollProgress })
   };
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b border-[#351010] bg-[#080808]/92 backdrop-blur-md">
-      {/* Subtle red top progress hairline */}
+    <header className="fixed inset-x-0 top-0 z-50 border-b border-[#351010] bg-[#080808]/90 backdrop-blur-md">
+      {/* Continuous crimson scroll progress indicator */}
       <div
-        className="h-[2px] bg-gradient-to-r from-[#650000] via-[#E60012] to-[#FF101A] transition-[width] duration-150 ease-out"
+        className="h-[2px] bg-gradient-to-r from-[#650000] via-[#E60012] to-[#FF101A] shadow-[0_0_10px_rgba(255,16,26,0.8)] transition-[width] duration-150 ease-out"
         style={{ width: `${Math.round(scrollProgress * 100)}%` }}
         aria-hidden="true"
       />
 
       <nav
+        ref={navRef}
         aria-label="Primary Navigation"
-        className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8"
+        className="perspective-1000 mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8"
       >
         {/* Left Logo: SK. PORTFOLIO */}
         <a
           href="#home"
           onClick={(e) => handleNavClick(e, 'home')}
-          className="group inline-flex items-baseline gap-1.5 font-condensed text-xl font-bold tracking-[0.12em] uppercase"
+          className="nav-item-3d group inline-flex items-baseline gap-1.5 font-condensed text-xl font-bold tracking-[0.12em] uppercase"
         >
           <span className="text-white">SK</span>
           <span className="text-[#FF101A]">.</span>
@@ -58,7 +89,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeSection, scrollProgress })
           {NAV_ITEMS.map((item) => {
             const isActive = activeSection === item.id;
             return (
-              <li key={item.id}>
+              <li key={item.id} className="nav-item-3d">
                 <a
                   href={item.href}
                   onClick={(e) => handleNavClick(e, item.id)}
@@ -68,7 +99,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeSection, scrollProgress })
                 >
                   {item.label}
                   <span
-                    className={`absolute inset-x-3.5 bottom-0 h-[2px] bg-[#FF101A] transition-transform duration-200 origin-left ${
+                    className={`absolute inset-x-3.5 bottom-0 h-[2px] origin-left bg-[#FF101A] transition-transform duration-200 ${
                       isActive ? 'scale-x-100' : 'scale-x-0'
                     }`}
                     aria-hidden="true"

@@ -10,7 +10,7 @@ export const Footer: React.FC = () => {
   };
 
   return (
-    <footer className="relative border-t border-[#351010] bg-[#060606]">
+    <footer className="relative z-10 border-t border-[#351010] bg-[#060606]/95 backdrop-blur-sm">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="flex flex-col justify-between gap-8 md:flex-row md:items-end">
           <div className="space-y-2.5">

@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { Suspense, lazy, useCallback, useState } from 'react';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { PageLoader } from './components/PageLoader';
@@ -13,6 +13,10 @@ import { EducationSection } from './sections/EducationSection';
 import { ContactSection } from './sections/ContactSection';
 import { useScrollProgress } from './hooks/useScrollProgress';
 
+const Scene3D = lazy(() =>
+  import('./components/Scene3D').then((mod) => ({ default: mod.Scene3D }))
+);
+
 export const App: React.FC = () => {
   const { progress, activeSection } = useScrollProgress();
   const [loaderDone, setLoaderDone] = useState(false);
@@ -23,7 +27,13 @@ export const App: React.FC = () => {
 
   return (
     <div className="relative min-h-screen bg-[#080808] text-white">
+      {/* 1% -> 100% Cinematic Black & Red Loader */}
       <PageLoader onComplete={handleLoaderComplete} />
+
+      {/* Lazy-Loaded Responsive 3D WebGL Environment & Cinematic Camera */}
+      <Suspense fallback={<div className="fixed inset-0 z-0 bg-[#080808]" aria-hidden="true" />}>
+        <Scene3D ready={loaderDone} />
+      </Suspense>
 
       <a
         href="#main-content"
@@ -32,9 +42,9 @@ export const App: React.FC = () => {
         Skip to main content
       </a>
 
-      <Navbar activeSection={activeSection} scrollProgress={progress} />
+      <Navbar activeSection={activeSection} scrollProgress={progress} ready={loaderDone} />
 
-      <main id="main-content" className="relative">
+      <main id="main-content" className="relative z-10">
         <HeroSection ready={loaderDone} />
         <AboutSection />
         <MonitoringSection />

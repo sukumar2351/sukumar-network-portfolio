@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import {
   AlertTriangle,
   CheckCircle2,
@@ -12,6 +14,8 @@ import {
 } from 'lucide-react';
 import { IspDeviceNode, ispTopologyDevices } from '../data/projects';
 import { useReducedMotion } from '../hooks/useReducedMotion';
+
+gsap.registerPlugin(ScrollTrigger);
 
 interface NetworkTopologyProps {
   selectedDeviceId: string;
@@ -40,6 +44,33 @@ export const NetworkTopology: React.FC<NetworkTopologyProps> = ({
   faultSimulated,
 }) => {
   const reducedMotion = useReducedMotion();
+  const chainRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (reducedMotion || !chainRef.current) return;
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        '.isp-node-3d',
+        { opacity: 0, y: 28, rotateX: -16, transformOrigin: '50% 100%' },
+        {
+          opacity: 1,
+          y: 0,
+          rotateX: 0,
+          duration: 0.72,
+          stagger: 0.09,
+          ease: 'power3.out',
+          clearProps: 'transform,opacity',
+          scrollTrigger: {
+            trigger: chainRef.current,
+            start: 'top 86%',
+            once: true,
+          },
+        }
+      );
+    }, chainRef);
+    return () => ctx.revert();
+  }, [reducedMotion]);
+
   const selectedDevice: IspDeviceNode =
     ispTopologyDevices.find((d) => d.id === selectedDeviceId) ?? ispTopologyDevices[1];
 
@@ -47,7 +78,7 @@ export const NetworkTopology: React.FC<NetworkTopologyProps> = ({
     faultSimulated && (id === 'access-switch' || id === 'end-devices');
 
   return (
-    <div className="space-y-6">
+    <div ref={chainRef} className="space-y-6">
       {/* Interactive Black-and-Red Topology Chain */}
       <div className="cr-panel cr-fine-grid relative overflow-hidden p-4 sm:p-6">
         <div className="mb-5 flex flex-wrap items-center justify-between gap-2 border-b border-[#351010] pb-3">
@@ -119,14 +150,14 @@ export const NetworkTopology: React.FC<NetworkTopologyProps> = ({
           </svg>
 
           {/* 5 Interactive Topology Nodes */}
-          <div className="relative z-10 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5 lg:gap-4">
+          <div className="perspective-1200 relative z-10 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5 lg:gap-4">
             {ispTopologyDevices.map((device, idx) => {
               const Icon = getDeviceIcon(device.id);
               const isSelected = device.id === selectedDevice.id;
               const degraded = isAffectedByFault(device.id);
 
               return (
-                <div key={device.id} className="relative flex flex-col">
+                <div key={device.id} className="isp-node-3d relative flex flex-col">
                   {idx > 0 && (
                     <div
                       className="mx-auto mb-3 flex h-5 items-center justify-center sm:hidden"

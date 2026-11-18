@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import {
   Building2,
   GitBranch,
@@ -15,7 +17,10 @@ import {
   enterpriseNodes,
   EnterpriseNode,
 } from '../data/projects';
+import { TiltCard3D } from './TiltCard3D';
 import { useReducedMotion } from '../hooks/useReducedMotion';
+
+gsap.registerPlugin(ScrollTrigger);
 
 const getNodeGlyph = (type: EnterpriseNode['deviceType']) => {
   switch (type) {
@@ -35,6 +40,47 @@ const getNodeGlyph = (type: EnterpriseNode['deviceType']) => {
 export const EnterpriseArchitecture: React.FC = () => {
   const reducedMotion = useReducedMotion();
   const [selectedNodeId, setSelectedNodeId] = useState<string>('hq-core');
+  const wrapRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (reducedMotion || !wrapRef.current) return;
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        '.ent-svg-link',
+        { opacity: 0 },
+        {
+          opacity: 1,
+          duration: 0.7,
+          stagger: 0.05,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: wrapRef.current,
+            start: 'top 84%',
+            once: true,
+          },
+        }
+      );
+
+      gsap.fromTo(
+        '.ent-svg-node',
+        { opacity: 0, scale: 0.88, transformOrigin: 'center center' },
+        {
+          opacity: 1,
+          scale: 1,
+          duration: 0.65,
+          stagger: 0.055,
+          ease: 'back.out(1.4)',
+          clearProps: 'opacity',
+          scrollTrigger: {
+            trigger: wrapRef.current,
+            start: 'top 84%',
+            once: true,
+          },
+        }
+      );
+    }, wrapRef);
+    return () => ctx.revert();
+  }, [reducedMotion]);
 
   const selectedNode =
     enterpriseNodes.find((n) => n.id === selectedNodeId) ?? enterpriseNodes[0];
@@ -42,7 +88,7 @@ export const EnterpriseArchitecture: React.FC = () => {
   const getNodeById = (id: string) => enterpriseNodes.find((n) => n.id === id);
 
   return (
-    <div className="space-y-8">
+    <div ref={wrapRef} className="space-y-8">
       {/* Main Technical Diagram + Selected Device Purpose Panel */}
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-12">
         <div className="cr-panel cr-fine-grid relative overflow-hidden p-4 sm:p-5 xl:col-span-8">
@@ -155,7 +201,7 @@ export const EnterpriseArchitecture: React.FC = () => {
                 const isWan = link.kind === 'wan';
 
                 return (
-                  <g key={link.id}>
+                  <g key={link.id} className="ent-svg-link">
                     <line
                       x1={from.x}
                       y1={from.y}
@@ -195,7 +241,7 @@ export const EnterpriseArchitecture: React.FC = () => {
                   <g
                     key={node.id}
                     transform={`translate(${node.x - boxW / 2}, ${node.y - boxH / 2})`}
-                    className="cursor-pointer"
+                    className="ent-svg-node cursor-pointer"
                     onClick={() => setSelectedNodeId(node.id)}
                     onMouseEnter={() => setSelectedNodeId(node.id)}
                     role="button"
@@ -333,26 +379,27 @@ export const EnterpriseArchitecture: React.FC = () => {
         {enterpriseConcepts.map((concept) => {
           const isLinked = selectedNode.id === concept.targetNodeId;
           return (
-            <button
-              key={concept.id}
-              type="button"
-              onClick={() => setSelectedNodeId(concept.targetNodeId)}
-              className={`flex flex-col border p-4 text-left transition-all ${
-                isLinked
-                  ? 'border-[#FF101A] bg-[#180707]'
-                  : 'border-[#351010] bg-[#120707] hover:border-[#E60012]'
-              }`}
-            >
-              <span className="font-mono text-[10px] tracking-[0.14em] text-[#FF101A] uppercase">
-                {concept.tag}
-              </span>
-              <h4 className="mt-1.5 font-display text-base font-bold text-white">
-                {concept.title}
-              </h4>
-              <p className="mt-2 text-xs leading-relaxed text-[#B8B8B8]">
-                {concept.summary}
-              </p>
-            </button>
+            <TiltCard3D key={concept.id} maxTilt={4.5} className="h-full">
+              <button
+                type="button"
+                onClick={() => setSelectedNodeId(concept.targetNodeId)}
+                className={`flex h-full w-full flex-col border p-4 text-left transition-all ${
+                  isLinked
+                    ? 'border-[#FF101A] bg-[#180707]'
+                    : 'border-[#351010] bg-[#120707] hover:border-[#E60012]'
+                }`}
+              >
+                <span className="font-mono text-[10px] tracking-[0.14em] text-[#FF101A] uppercase">
+                  {concept.tag}
+                </span>
+                <h4 className="mt-1.5 font-display text-base font-bold text-white">
+                  {concept.title}
+                </h4>
+                <p className="mt-2 text-xs leading-relaxed text-[#B8B8B8]">
+                  {concept.summary}
+                </p>
+              </button>
+            </TiltCard3D>
           );
         })}
       </div>

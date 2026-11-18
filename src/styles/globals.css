@@ -65,21 +65,107 @@
   font-family: var(--font-condensed);
 }
 
+/* 3D Dimensional Extrusion Typography */
+.text-3d-white {
+  color: #FFFFFF;
+  text-shadow:
+    0 1px 0 rgba(215, 215, 222, 0.9),
+    0 2px 0 rgba(165, 165, 175, 0.65),
+    0 4px 0 rgba(48, 12, 14, 0.85),
+    0 8px 24px rgba(0, 0, 0, 0.85),
+    0 0 36px rgba(255, 16, 26, 0.14);
+}
+
+.text-3d-red {
+  color: #FF101A;
+  text-shadow:
+    0 1px 0 #C9000E,
+    0 2px 0 #99000A,
+    0 4px 0 #650000,
+    0 6px 0 #380003,
+    0 12px 28px rgba(255, 16, 26, 0.34),
+    0 16px 40px rgba(0, 0, 0, 0.92);
+}
+
+.text-3d-section {
+  text-shadow:
+    0 2px 0 rgba(53, 16, 16, 0.9),
+    0 6px 18px rgba(0, 0, 0, 0.8);
+}
+
+/* 3D Perspective Containers */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.perspective-1200 {
+  perspective: 1200px;
+}
+
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
 /* Exact Black & Crimson Surface Utilities */
 .cr-card {
-  background-color: #120707;
+  background-color: rgba(18, 7, 7, 0.9);
   border: 1px solid #351010;
-  transition: border-color 0.25s ease, transform 0.25s ease, background-color 0.25s ease;
+  backdrop-filter: blur(6px);
+  transition: border-color 0.28s ease, box-shadow 0.28s ease, background-color 0.28s ease;
 }
 
 .cr-card:hover {
   border-color: #E60012;
-  background-color: #160808;
+  background-color: rgba(24, 8, 8, 0.94);
+  box-shadow: 0 18px 42px -18px rgba(255, 16, 26, 0.32);
 }
 
 .cr-panel {
-  background-color: #0D0505;
+  background-color: rgba(13, 5, 5, 0.9);
   border: 1px solid #351010;
+  backdrop-filter: blur(8px);
+}
+
+/* 3D Dimensional Button Hover */
+.btn-3d-red {
+  position: relative;
+  overflow: hidden;
+  background-color: #FF101A;
+  box-shadow:
+    0 4px 0 #7A0007,
+    0 14px 36px -8px rgba(255, 16, 26, 0.65);
+  transition: transform 0.22s ease, box-shadow 0.22s ease, background-color 0.22s ease;
+}
+
+.btn-3d-red:hover {
+  background-color: #E60012;
+  transform: translateY(-2px);
+  box-shadow:
+    0 6px 0 #650000,
+    0 18px 44px -6px rgba(255, 16, 26, 0.8);
+}
+
+.btn-3d-red:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 0 #650000;
+}
+
+.btn-3d-dark {
+  position: relative;
+  overflow: hidden;
+  background-color: rgba(18, 7, 7, 0.92);
+  border: 1px solid #351010;
+  box-shadow: 0 4px 0 #1E0707;
+  transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease, background-color 0.22s ease;
+}
+
+.btn-3d-dark:hover {
+  border-color: #FF101A;
+  background-color: rgba(101, 0, 0, 0.35);
+  transform: translateY(-2px);
+  box-shadow:
+    0 6px 0 #351010,
+    0 14px 30px -12px rgba(255, 16, 26, 0.45);
 }
 
 .cr-diagonal-panel {
@@ -92,8 +178,8 @@
 
 .cr-tech-grid {
   background-image:
-    linear-gradient(to right, rgba(255, 16, 26, 0.045) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 16, 26, 0.045) 1px, transparent 1px);
+    linear-gradient(to right, rgba(255, 16, 26, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 16, 26, 0.04) 1px, transparent 1px);
   background-size: 48px 48px;
 }
 

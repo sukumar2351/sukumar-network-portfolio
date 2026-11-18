@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ArrowDownRight, ArrowRight } from 'lucide-react';
 import { profile } from '../data/profile';
+import { AnimatedText } from '../components/AnimatedText';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 
 interface HeroSectionProps {
@@ -10,47 +11,115 @@ interface HeroSectionProps {
 
 export const HeroSection: React.FC<HeroSectionProps> = ({ ready = true }) => {
   const heroRef = useRef<HTMLElement>(null);
+  const portraitRigRef = useRef<HTMLDivElement>(null);
+  const backShardRef = useRef<HTMLDivElement>(null);
+  const midShardRef = useRef<HTMLDivElement>(null);
+  const rimLightRef = useRef<HTMLDivElement>(null);
   const reducedMotion = useReducedMotion();
   const [imgSrc, setImgSrc] = useState<string>(profile.portraitCutoutUrl);
 
+  // Coordinated GSAP 3D Hero Entrance after PageLoader lifts
   useEffect(() => {
     if (reducedMotion || !heroRef.current) return;
 
     const ctx = gsap.context(() => {
       if (!ready) {
-        gsap.set('.hero-shard', { x: 80, opacity: 0 });
-        gsap.set('.hero-portrait', { y: 36, scale: 0.96, opacity: 0 });
-        gsap.set('.hero-copy', { y: 26, opacity: 0 });
+        gsap.set('.hero-shard', { x: 90, opacity: 0 });
+        gsap.set('.hero-portrait', { y: 42, scale: 0.94, rotateY: -8, opacity: 0 });
+        gsap.set('.hero-copy', { y: 26, rotateX: -18, opacity: 0 });
         return;
       }
 
-      const tl = gsap.timeline({ delay: 0.28, defaults: { ease: 'power3.out' } });
+      const tl = gsap.timeline({ delay: 0.25, defaults: { ease: 'power3.out' } });
 
-      // 1. Angular crimson panels glide in smoothly
+      // 1. Angular red geometric panels glide into 3D space
       tl.fromTo(
         '.hero-shard',
-        { x: 80, opacity: 0 },
-        { x: 0, opacity: 1, duration: 1.15, stagger: 0.11, clearProps: 'transform,opacity' },
+        { x: 90, opacity: 0 },
+        { x: 0, opacity: 1, duration: 1.15, stagger: 0.1, clearProps: 'transform,opacity' },
         0
       )
-        // 2. Left editorial heading & CTAs reveal with calm, deliberate rhythm
-        .fromTo(
-          '.hero-copy',
-          { y: 26, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.9, stagger: 0.14, clearProps: 'transform,opacity' },
-          0.25
-        )
-        // 3. Portrait rises smoothly into the angular crimson framing
+        // 2. Portrait enters with subtle 3D depth & perspective rotation
         .fromTo(
           '.hero-portrait',
-          { y: 36, scale: 0.96, opacity: 0 },
-          { y: 0, scale: 1, opacity: 1, duration: 1.25, clearProps: 'transform,opacity' },
-          0.42
+          { y: 42, scale: 0.94, rotateY: -8, opacity: 0 },
+          { y: 0, scale: 1, rotateY: 0, opacity: 1, duration: 1.3, clearProps: 'transform,opacity' },
+          0.3
+        )
+        // 3. Supporting copy, subtitle & 3D buttons reveal cleanly
+        .fromTo(
+          '.hero-copy',
+          { y: 26, rotateX: -18, opacity: 0 },
+          { y: 0, rotateX: 0, opacity: 1, duration: 0.9, stagger: 0.13, clearProps: 'transform,opacity' },
+          0.35
         );
     }, heroRef);
 
     return () => ctx.revert();
   }, [ready, reducedMotion]);
+
+  // Subtle Desktop/Laptop Mouse-Based 3D Portrait Parallax & Red Rim Light Shift
+  useEffect(() => {
+    if (reducedMotion) return;
+
+    let rafId = 0;
+    const target = { x: 0, y: 0 };
+    const current = { x: 0, y: 0 };
+
+    const isDesktop = () =>
+      window.innerWidth >= 1024 && window.matchMedia('(pointer: fine)').matches;
+
+    const onMouseMove = (e: MouseEvent) => {
+      if (!isDesktop()) return;
+      target.x = (e.clientX / window.innerWidth - 0.5) * 2;
+      target.y = (e.clientY / window.innerHeight - 0.5) * 2;
+    };
+
+    const animate = () => {
+      current.x += (target.x - current.x) * 0.065;
+      current.y += (target.y - current.y) * 0.065;
+
+      if (isDesktop()) {
+        if (portraitRigRef.current) {
+          portraitRigRef.current.style.transform = `perspective(1200px) rotateY(${(
+            current.x * 4.2
+          ).toFixed(2)}deg) rotateX(${(-current.y * 3.0).toFixed(2)}deg) translate3d(${(
+            current.x * 8
+          ).toFixed(1)}px, ${(current.y * 5).toFixed(1)}px, 0)`;
+        }
+        if (backShardRef.current) {
+          backShardRef.current.style.transform = `translate3d(${(-current.x * 14).toFixed(
+            1
+          )}px, ${(-current.y * 10).toFixed(1)}px, 0)`;
+        }
+        if (midShardRef.current) {
+          midShardRef.current.style.transform = `translate3d(${(-current.x * 8).toFixed(
+            1
+          )}px, ${(-current.y * 6).toFixed(1)}px, 0)`;
+        }
+        if (rimLightRef.current) {
+          rimLightRef.current.style.transform = `translate3d(${(current.x * 18).toFixed(
+            1
+          )}px, ${(current.y * 12).toFixed(1)}px, 0)`;
+        }
+      } else {
+        if (portraitRigRef.current) portraitRigRef.current.style.transform = '';
+        if (backShardRef.current) backShardRef.current.style.transform = '';
+        if (midShardRef.current) midShardRef.current.style.transform = '';
+        if (rimLightRef.current) rimLightRef.current.style.transform = '';
+      }
+
+      rafId = requestAnimationFrame(animate);
+    };
+
+    window.addEventListener('mousemove', onMouseMove, { passive: true });
+    rafId = requestAnimationFrame(animate);
+
+    return () => {
+      window.removeEventListener('mousemove', onMouseMove);
+      cancelAnimationFrame(rafId);
+    };
+  }, [reducedMotion]);
 
   const scrollTo = (id: string) => {
     const el = document.getElementById(id);
@@ -61,36 +130,33 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ ready = true }) => {
     <section
       id="home"
       ref={heroRef}
-      className="relative flex min-h-screen items-center overflow-hidden bg-[#080808] pt-24 pb-16 lg:pt-20 lg:pb-0"
+      className="relative flex min-h-screen items-center overflow-hidden pt-24 pb-16 lg:pt-20 lg:pb-8"
     >
-      {/* Dramatic Black & Red Geometric Background + Subtle World/Network Line Patterns */}
+      {/* Layered Black & Crimson Angular Geometric Composition over 3D WebGL Stage */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
-        {/* Fine technical grid */}
-        <div className="cr-tech-grid absolute inset-0 opacity-75" />
-
-        {/* Subtle red studio backlight behind right portrait */}
+        {/* Atmospheric red backlight glow */}
         <div
-          className={`absolute -right-24 top-1/2 h-[640px] w-[640px] -translate-y-1/2 rounded-full blur-[125px] ${
+          className={`absolute -right-24 top-1/2 h-[640px] w-[640px] -translate-y-1/2 rounded-full blur-[130px] ${
             reducedMotion ? '' : 'animate-red-drift'
           }`}
           style={{
             background:
-              'radial-gradient(circle, rgba(255, 16, 26, 0.44) 0%, rgba(101, 0, 0, 0.28) 46%, rgba(8, 8, 8, 0) 76%)',
+              'radial-gradient(circle, rgba(255, 16, 26, 0.42) 0%, rgba(101, 0, 0, 0.25) 48%, rgba(8, 8, 8, 0) 76%)',
           }}
         />
 
         {/* Secondary red light sweep */}
         <div
-          className={`absolute right-[10%] top-[8%] h-[480px] w-[360px] blur-[90px] ${
+          className={`absolute right-[10%] top-[8%] h-[480px] w-[360px] blur-[95px] ${
             reducedMotion ? '' : 'animate-red-sweep'
           }`}
           style={{
             background:
-              'linear-gradient(135deg, rgba(230, 0, 18, 0.34) 0%, rgba(101, 0, 0, 0.1) 70%, transparent 100%)',
+              'linear-gradient(135deg, rgba(230, 0, 18, 0.34) 0%, rgba(101, 0, 0, 0.08) 70%, transparent 100%)',
           }}
         />
 
-        {/* Subtle World Network Connection Map & Angular Crimson Panels SVG */}
+        {/* Angular Red Geometric Panels + Subtle Network Connection Lines */}
         <svg
           className="absolute inset-0 h-full w-full"
           viewBox="0 0 1440 900"
@@ -99,22 +165,22 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ ready = true }) => {
         >
           <defs>
             <linearGradient id="redPrimaryPanel" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#FF101A" stopOpacity="0.92" />
-              <stop offset="52%" stopColor="#E60012" stopOpacity="0.88" />
-              <stop offset="100%" stopColor="#650000" stopOpacity="0.95" />
+              <stop offset="0%" stopColor="#FF101A" stopOpacity="0.82" />
+              <stop offset="52%" stopColor="#E60012" stopOpacity="0.78" />
+              <stop offset="100%" stopColor="#650000" stopOpacity="0.88" />
             </linearGradient>
             <linearGradient id="redDeepPanel" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#650000" stopOpacity="0.72" />
-              <stop offset="100%" stopColor="#120707" stopOpacity="0.94" />
+              <stop offset="0%" stopColor="#650000" stopOpacity="0.52" />
+              <stop offset="100%" stopColor="#120707" stopOpacity="0.78" />
             </linearGradient>
             <linearGradient id="darkCutSlice" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#120707" stopOpacity="0.92" />
-              <stop offset="100%" stopColor="#080808" stopOpacity="0.98" />
+              <stop offset="0%" stopColor="#120707" stopOpacity="0.84" />
+              <stop offset="100%" stopColor="#080808" stopOpacity="0.9" />
             </linearGradient>
           </defs>
 
-          {/* Subtle global network connection arcs & world-node mesh on left/center dark canvas */}
-          <g opacity="0.28">
+          {/* Subtle Network Connection Arcs on Dark Left Canvas */}
+          <g opacity="0.3">
             <path
               d="M 70 250 Q 290 140 520 270 T 940 210"
               stroke="#FF101A"
@@ -127,65 +193,35 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ ready = true }) => {
               strokeWidth="1"
               className={reducedMotion ? '' : 'animate-packet-flow-reverse'}
             />
-            <path
-              d="M 180 420 L 340 310 L 520 390 L 660 280"
-              stroke="#FFFFFF"
-              strokeOpacity="0.24"
-              strokeWidth="0.9"
-              strokeDasharray="3 5"
-            />
-            {[
-              [120, 238],
-              [265, 195],
-              [340, 310],
-              [520, 270],
-              [520, 390],
-              [180, 420],
-              [360, 560],
-              [590, 590],
-              [660, 280],
-            ].map(([cx, cy], idx) => (
-              <g key={idx}>
-                <circle cx={cx} cy={cy} r="2.5" fill={idx % 2 === 0 ? '#FF101A' : '#FFFFFF'} />
-                <circle
-                  cx={cx}
-                  cy={cy}
-                  r="8"
-                  stroke="#FF101A"
-                  strokeOpacity="0.3"
-                  strokeWidth="0.8"
-                />
-              </g>
-            ))}
           </g>
 
-          {/* Large angular deep-crimson back panel */}
+          {/* Angular Crimson Back Plane */}
           <polygon
             className="hero-shard"
-            points="780,0 1440,0 1440,900 545,900"
+            points="795,0 1440,0 1440,900 560,900"
             fill="url(#redDeepPanel)"
           />
 
-          {/* Bold primary red diagonal panel behind portrait */}
+          {/* Bold Primary Red Diagonal Panel */}
           <polygon
             className="hero-shard"
-            points="920,0 1335,0 1075,900 660,900"
+            points="930,0 1340,0 1080,900 670,900"
             fill="url(#redPrimaryPanel)"
           />
 
-          {/* Sharp matte black foreground diagonal cut */}
+          {/* Sharp Obsidian Foreground Cut */}
           <polygon
             className="hero-shard"
-            points="1265,0 1440,0 1440,900 1098,900"
+            points="1270,0 1440,0 1440,900 1104,900"
             fill="url(#darkCutSlice)"
           />
 
-          {/* Crisp red highlight diagonal lines */}
+          {/* Precision Red Razor Highlight Lines */}
           <line
             className="hero-shard"
-            x1="780"
+            x1="795"
             y1="0"
-            x2="545"
+            x2="560"
             y2="900"
             stroke="#FF101A"
             strokeOpacity="0.52"
@@ -193,84 +229,105 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ ready = true }) => {
           />
           <line
             className="hero-shard"
-            x1="920"
+            x1="930"
             y1="0"
-            x2="660"
+            x2="670"
             y2="900"
             stroke="#FF101A"
-            strokeOpacity="0.82"
+            strokeOpacity="0.85"
             strokeWidth="2"
-          />
-          <line
-            className="hero-shard"
-            x1="1335"
-            y1="0"
-            x2="1075"
-            y2="900"
-            stroke="#E60012"
-            strokeOpacity="0.48"
-            strokeWidth="1.5"
           />
           <polygon
             className="hero-shard"
-            points="842,0 874,0 824,185 792,185"
+            points="850,0 882,0 832,185 800,185"
             fill="#FF101A"
             fillOpacity="0.9"
           />
         </svg>
 
-        {/* Left dark readability gradient */}
+        {/* Left Dark Readability Scrim (preserving 3D scene visibility behind text) */}
         <div
           className="absolute inset-0"
           style={{
             background:
-              'linear-gradient(90deg, rgba(8, 8, 8, 0.96) 0%, rgba(8, 8, 8, 0.86) 44%, rgba(8, 8, 8, 0.16) 72%, rgba(8, 8, 8, 0.44) 100%)',
+              'linear-gradient(90deg, rgba(8, 8, 8, 0.86) 0%, rgba(8, 8, 8, 0.68) 42%, rgba(8, 8, 8, 0.12) 72%, rgba(8, 8, 8, 0.36) 100%)',
           }}
         />
       </div>
 
-      {/* Two-Column Hero Layout */}
+      {/* Responsive Two-Column (Desktop/Laptop) & Centered Vertical (Tablet/Mobile) Composition */}
       <div className="relative z-10 mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-12 lg:gap-8">
-          {/* LEFT COLUMN */}
-          <div className="order-2 lg:order-1 lg:col-span-6 lg:py-16">
+        <div className="grid grid-cols-1 items-center gap-10 md:gap-12 lg:grid-cols-12 lg:gap-8">
+          {/* LEFT COLUMN: 3D Dimensional Typography & Actions */}
+          <div className="perspective-1200 order-2 text-left md:mx-auto md:max-w-2xl md:text-center lg:order-1 lg:col-span-6 lg:mx-0 lg:max-w-none lg:py-12 lg:text-left">
             {/* Small Label */}
-            <div className="hero-copy flex items-center gap-3">
+            <div className="hero-copy flex items-center gap-3 md:justify-center lg:justify-start">
               <span className="h-[2px] w-10 bg-[#FF101A]" aria-hidden="true" />
               <span className="font-mono text-xs font-medium tracking-[0.24em] text-[#B8B8B8] uppercase">
                 {profile.smallLabel}
               </span>
             </div>
 
-            {/* Main Heading: SUKUMAR (White) + KARNAM (Bold Red #FF101A) */}
-            <h1 className="hero-copy mt-5 font-condensed text-6xl font-bold leading-[0.92] tracking-[0.02em] uppercase sm:text-7xl xl:text-[6.2rem]">
-              <span className="block text-white">{profile.firstName}</span>
-              <span className="block text-[#FF101A]">{profile.lastName}</span>
+            {/* Monumental 3D Character-by-Character Extruded Name */}
+            <h1
+              className="mt-5 font-condensed text-[3.6rem] font-bold leading-[0.9] tracking-[0.025em] uppercase sm:text-7xl lg:text-[5.2rem] xl:text-[6.4rem]"
+              aria-label="SUKUMAR KARNAM"
+            >
+              <AnimatedText
+                text={profile.firstName}
+                as="span"
+                mode="chars3d"
+                trigger="ready"
+                ready={ready}
+                delay={0.32}
+                stagger={0.055}
+                duration={0.95}
+                className="text-3d-white block"
+              />
+              <AnimatedText
+                text={profile.lastName}
+                as="span"
+                mode="chars3d"
+                trigger="ready"
+                ready={ready}
+                delay={0.58}
+                stagger={0.06}
+                duration={0.98}
+                className="text-3d-red block"
+              />
             </h1>
 
             {/* Professional Title */}
             <div className="hero-copy mt-5 inline-flex items-center gap-3 border-l-2 border-[#FF101A] pl-4">
-              <span className="font-display text-lg font-semibold tracking-[0.22em] text-white uppercase sm:text-xl">
+              <span className="font-display text-base font-semibold tracking-[0.24em] text-white uppercase sm:text-xl">
                 {profile.title}
               </span>
             </div>
 
             {/* Supporting Text */}
-            <p className="hero-copy mt-6 max-w-xl font-display text-lg font-medium leading-snug text-white sm:text-xl">
-              {profile.subtitle}
-            </p>
+            <AnimatedText
+              text={profile.subtitle}
+              as="p"
+              mode="words3d"
+              trigger="ready"
+              ready={ready}
+              delay={0.82}
+              stagger={0.045}
+              duration={0.78}
+              className="mt-5 max-w-xl font-display text-lg font-medium leading-snug text-white md:mx-auto sm:text-xl lg:mx-0"
+            />
 
             {/* Introduction */}
-            <p className="hero-copy mt-4 max-w-xl text-sm leading-relaxed text-[#B8B8B8] sm:text-base">
+            <p className="hero-copy mt-4 max-w-xl text-sm leading-relaxed text-[#B8B8B8] md:mx-auto sm:text-base lg:mx-0">
               {profile.heroIntro}
             </p>
 
-            {/* Two CTA Buttons */}
-            <div className="hero-copy mt-8 flex flex-wrap items-center gap-4">
+            {/* 3D Dimensional CTA Buttons */}
+            <div className="hero-copy mt-8 flex flex-wrap items-center gap-4 md:justify-center lg:justify-start">
               <button
                 type="button"
                 onClick={() => scrollTo('projects')}
-                className="group inline-flex items-center gap-3 bg-[#FF101A] px-7 py-4 font-mono text-xs font-semibold tracking-[0.18em] text-white uppercase shadow-[0_12px_36px_-8px_rgba(255,16,26,0.68)] transition-all hover:bg-[#E60012] hover:shadow-[0_16px_42px_-6px_rgba(255,16,26,0.82)]"
+                className="btn-3d-red group inline-flex items-center gap-3 px-7 py-4 font-mono text-xs font-semibold tracking-[0.18em] text-white uppercase"
               >
                 <span>EXPLORE MY WORK</span>
                 <ArrowRight
@@ -282,7 +339,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ ready = true }) => {
               <button
                 type="button"
                 onClick={() => scrollTo('contact')}
-                className="group inline-flex items-center gap-3 border border-[#351010] bg-[#120707]/90 px-7 py-4 font-mono text-xs font-semibold tracking-[0.18em] text-white uppercase backdrop-blur-sm transition-all hover:border-[#FF101A] hover:bg-[#650000]/35"
+                className="btn-3d-dark group inline-flex items-center gap-3 px-7 py-4 font-mono text-xs font-semibold tracking-[0.18em] text-white uppercase"
               >
                 <span>CONTACT ME</span>
                 <ArrowDownRight
@@ -292,8 +349,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ ready = true }) => {
               </button>
             </div>
 
-            {/* Subtle technical metadata footer */}
-            <div className="hero-copy mt-10 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-[#351010] pt-5 font-mono text-[11px] tracking-[0.16em] text-[#B8B8B8] uppercase">
+            {/* Subtle Focus Metadata */}
+            <div className="hero-copy mt-9 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-[#351010] pt-5 font-mono text-[11px] tracking-[0.16em] text-[#B8B8B8] uppercase md:justify-center lg:justify-start">
               <span>Routing &amp; Switching</span>
               <span className="text-[#FF101A]" aria-hidden="true">
                 /
@@ -306,29 +363,45 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ ready = true }) => {
             </div>
           </div>
 
-          {/* RIGHT COLUMN: Actual Portrait Integrated into Angular Red Panels */}
-          <div className="order-1 flex justify-center lg:order-2 lg:col-span-6 lg:justify-end">
-            <div className="hero-portrait relative w-full max-w-[430px] sm:max-w-[500px] lg:max-w-[580px]">
-              {/* Primary angular red geometric frame behind portrait */}
+          {/* RIGHT COLUMN: 3D Parallax Portrait Cutout + Red Rim Lighting */}
+          <div className="perspective-1200 order-1 flex justify-center lg:order-2 lg:col-span-6 lg:justify-end">
+            <div className="hero-portrait relative w-full max-w-[330px] sm:max-w-[430px] md:max-w-[460px] lg:max-w-[520px] xl:max-w-[570px]">
+              {/* Back Angular Crimson Geometric Panel (Parallax Layer 1) */}
               <div
-                className="cr-diagonal-panel pointer-events-none absolute -inset-x-4 bottom-6 top-8 bg-gradient-to-br from-[#FF101A] via-[#E60012] to-[#650000] opacity-92 shadow-[0_30px_90px_-15px_rgba(255,16,26,0.5)]"
+                ref={backShardRef}
+                className="cr-diagonal-panel pointer-events-none absolute -inset-x-3 bottom-6 top-8 bg-gradient-to-br from-[#FF101A] via-[#E60012] to-[#650000] opacity-92 shadow-[0_30px_90px_-15px_rgba(255,16,26,0.52)] will-change-transform sm:-inset-x-4"
                 aria-hidden="true"
               />
 
-              {/* Dark crimson offset shard */}
+              {/* Mid Obsidian Geometric Offset Frame (Parallax Layer 2) */}
               <div
-                className="cr-diagonal-shard pointer-events-none absolute -right-3 bottom-12 top-2 w-[78%] border border-[#FF101A]/45 bg-[#120707]/50"
+                ref={midShardRef}
+                className="cr-diagonal-shard pointer-events-none absolute -right-2 bottom-12 top-2 w-[78%] border border-[#FF101A]/50 bg-[#120707]/52 will-change-transform sm:-right-3"
                 aria-hidden="true"
               />
 
-              {/* Red razor highlight accent */}
+              {/* Moving Red Rim-Light Halo Behind Portrait */}
               <div
-                className="pointer-events-none absolute left-4 top-6 h-24 w-[3px] -skew-x-12 bg-[#FF101A] shadow-[0_0_24px_rgba(255,16,26,0.95)]"
+                ref={rimLightRef}
+                className="pointer-events-none absolute inset-x-4 top-8 h-64 rounded-full blur-[65px] will-change-transform"
+                style={{
+                  background:
+                    'radial-gradient(circle, rgba(255, 16, 26, 0.55) 0%, rgba(230, 0, 18, 0.18) 55%, transparent 78%)',
+                }}
                 aria-hidden="true"
               />
 
-              {/* Actual Uploaded Portrait Cutout */}
-              <div className="relative z-10 overflow-hidden pt-2">
+              {/* Razor Red Accent Slash */}
+              <div
+                className="pointer-events-none absolute left-3 top-6 h-20 w-[3px] -skew-x-12 bg-[#FF101A] shadow-[0_0_24px_rgba(255,16,26,0.95)] sm:left-4 sm:h-24"
+                aria-hidden="true"
+              />
+
+              {/* Foreground 3D Portrait Rig (Zero Face Distortion, Uncropped Headroom) */}
+              <div
+                ref={portraitRigRef}
+                className="relative z-10 overflow-hidden pt-2 will-change-transform"
+              >
                 <img
                   src={imgSrc}
                   alt="Sukumar Karnam — Network Engineer"
@@ -337,25 +410,25 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ ready = true }) => {
                       setImgSrc(profile.portraitFallbackUrl);
                     }
                   }}
-                  className="mx-auto block h-auto w-full max-h-[540px] object-contain object-bottom drop-shadow-[0_24px_44px_rgba(0,0,0,0.88)] sm:max-h-[620px] lg:max-h-[690px]"
+                  className="mx-auto block h-auto w-full max-h-[400px] object-contain object-top drop-shadow-[0_24px_46px_rgba(0,0,0,0.9)] sm:max-h-[520px] lg:max-h-[590px] xl:max-h-[670px]"
                   style={{
                     filter: 'contrast(1.04) saturate(0.96)',
                   }}
                 />
 
-                {/* Bottom obsidian gradient blend */}
+                {/* Smooth Bottom Obsidian Fade */}
                 <div
-                  className="pointer-events-none absolute inset-x-0 bottom-0 h-32"
+                  className="pointer-events-none absolute inset-x-0 bottom-0 h-28 sm:h-32"
                   style={{
                     background:
-                      'linear-gradient(to top, #080808 0%, rgba(8, 8, 8, 0.78) 42%, rgba(8, 8, 8, 0) 100%)',
+                      'linear-gradient(to top, #080808 0%, rgba(8, 8, 8, 0.8) 44%, rgba(8, 8, 8, 0) 100%)',
                   }}
                   aria-hidden="true"
                 />
               </div>
 
-              {/* Clean bottom bar */}
-              <div className="relative z-20 -mt-5 flex items-center justify-between border-t border-[#FF101A]/55 bg-[#080808]/90 px-4 py-2.5 backdrop-blur-sm">
+              {/* Minimal Identity Bar */}
+              <div className="relative z-20 -mt-5 flex items-center justify-between border-t border-[#FF101A]/55 bg-[#080808]/92 px-4 py-2.5 backdrop-blur-sm">
                 <span className="font-mono text-[10px] tracking-[0.2em] text-white uppercase">
                   SUKUMAR KARNAM
                 </span>

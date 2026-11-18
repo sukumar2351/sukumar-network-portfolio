@@ -8,9 +8,10 @@ export const LabsSection: React.FC = () => {
       id="labs"
       sectionIndex="05"
       heading="HANDS-ON LABS"
+      headingMode="chars3d"
       tagline="Built through hands-on practice."
       description="Twelve core networking lab domains practicing addressing, VLANs, trunking, routing, ACLs, NAT, DHCP, DNS, ARP, and structured fault troubleshooting."
-      className="bg-[#0B0505]"
+      className="bg-[#0B0505]/80"
     >
       <LabExplorer />
     </SectionTransition>
