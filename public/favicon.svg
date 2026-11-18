@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <rect width="64" height="64" rx="4" fill="#070709"/>
+  <polygon points="36,0 64,0 64,64 14,64" fill="#8C0D18" fill-opacity="0.45"/>
+  <polygon points="46,0 64,0 64,44" fill="#E11D2E"/>
+  <rect x="3" y="3" width="58" height="58" stroke="#E11D2E" stroke-opacity="0.45" stroke-width="1.5"/>
+  <text x="32" y="40" text-anchor="middle" fill="#F4F4F6" font-family="Space Grotesk, sans-serif" font-size="24" font-weight="700" letter-spacing="1">SK</text>
+</svg>

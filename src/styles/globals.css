@@ -1,0 +1,135 @@
+@import "tailwindcss";
+@import "./animations.css";
+
+@theme {
+  --color-bg-primary: #080808;
+  --color-bg-secondary: #120707;
+  --color-crimson-deep: #650000;
+  --color-red-primary: #FF101A;
+  --color-red-highlight: #E60012;
+  --color-text-white: #FFFFFF;
+  --color-text-secondary: #B8B8B8;
+  --color-border-crimson: #351010;
+
+  --font-condensed: "Oswald", "Space Grotesk", system-ui, sans-serif;
+  --font-display: "Space Grotesk", system-ui, -apple-system, sans-serif;
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+@layer base {
+  :root {
+    --bg-primary: #080808;
+    --bg-secondary: #120707;
+    --crimson-deep: #650000;
+    --red-primary: #FF101A;
+    --red-highlight: #E60012;
+    --text-white: #FFFFFF;
+    --text-secondary: #B8B8B8;
+    --border-crimson: #351010;
+    color-scheme: dark;
+  }
+
+  html {
+    background-color: var(--bg-primary);
+    color: var(--text-white);
+    font-family: var(--font-sans);
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+  }
+
+  body {
+    background-color: var(--bg-primary);
+    color: var(--text-white);
+    min-height: 100vh;
+    overflow-x: hidden;
+    line-height: 1.65;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+  }
+
+  code, pre, kbd, samp {
+    font-family: var(--font-mono);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--red-primary);
+    outline-offset: 2px;
+  }
+}
+
+.font-condensed {
+  font-family: var(--font-condensed);
+}
+
+/* Exact Black & Crimson Surface Utilities */
+.cr-card {
+  background-color: #120707;
+  border: 1px solid #351010;
+  transition: border-color 0.25s ease, transform 0.25s ease, background-color 0.25s ease;
+}
+
+.cr-card:hover {
+  border-color: #E60012;
+  background-color: #160808;
+}
+
+.cr-panel {
+  background-color: #0D0505;
+  border: 1px solid #351010;
+}
+
+.cr-diagonal-panel {
+  clip-path: polygon(16% 0%, 100% 0%, 84% 100%, 0% 100%);
+}
+
+.cr-diagonal-shard {
+  clip-path: polygon(26% 0%, 100% 0%, 74% 100%, 0% 100%);
+}
+
+.cr-tech-grid {
+  background-image:
+    linear-gradient(to right, rgba(255, 16, 26, 0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 16, 26, 0.045) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+.cr-fine-grid {
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+/* Sleek Crimson Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #080808;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #351010;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #FF101A;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

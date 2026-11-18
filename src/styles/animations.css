@@ -1,0 +1,77 @@
+@keyframes red-light-drift {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.72;
+  }
+  50% {
+    transform: translate3d(-16px, 12px, 0) scale(1.06);
+    opacity: 0.94;
+  }
+}
+
+@keyframes red-rim-sweep {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) rotate(-14deg);
+    opacity: 0.34;
+  }
+  50% {
+    transform: translate3d(24px, -14px, 0) rotate(-12deg);
+    opacity: 0.58;
+  }
+}
+
+@keyframes packet-flow {
+  0% {
+    stroke-dashoffset: 64;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes packet-flow-reverse {
+  0% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: 64;
+  }
+}
+
+@keyframes status-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.42;
+    transform: scale(0.9);
+  }
+}
+
+.animate-red-drift {
+  animation: red-light-drift 9s ease-in-out infinite;
+}
+
+.animate-red-sweep {
+  animation: red-rim-sweep 11s ease-in-out infinite;
+}
+
+.animate-packet-flow {
+  stroke-dasharray: 6 10;
+  animation: packet-flow 2.2s linear infinite;
+}
+
+.animate-packet-flow-fast {
+  stroke-dasharray: 4 10;
+  animation: packet-flow 1.35s linear infinite;
+}
+
+.animate-packet-flow-reverse {
+  stroke-dasharray: 5 11;
+  animation: packet-flow-reverse 2.8s linear infinite;
+}
+
+.animate-status-pulse {
+  animation: status-pulse 2.4s ease-in-out infinite;
+}
