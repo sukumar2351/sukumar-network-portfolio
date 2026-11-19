@@ -10,7 +10,7 @@ import { useReducedMotion } from '../hooks/useReducedMotion';
 gsap.registerPlugin(ScrollTrigger);
 
 export const EducationSection: React.FC = () => {
-  const { education, certification } = profile;
+  const { education } = profile;
   const timelineRef = useRef<HTMLDivElement>(null);
   const reducedMotion = useReducedMotion();
 
@@ -109,75 +109,77 @@ export const EducationSection: React.FC = () => {
             </TiltCard3D>
           </div>
 
-          {/* Timeline Item 02: Certification */}
-          <div className="edu-timeline-item relative">
-            <span
-              className="absolute -left-[25px] top-8 h-3 w-3 border-2 border-[#FF101A] bg-[#080808] shadow-[0_0_12px_rgba(255,16,26,0.9)] sm:-left-[34px]"
-              aria-hidden="true"
-            />
-            <TiltCard3D maxTilt={4}>
-              <article className="cr-card flex flex-col justify-between p-6 sm:p-8">
-                <div>
-                  <div className="flex items-center justify-between border-b border-[#351010] pb-4">
-                    <span className="inline-flex items-center gap-2 font-mono text-xs tracking-[0.18em] text-[#FF101A] uppercase">
-                      <Award className="h-4 w-4" aria-hidden="true" />
-                      Certification
-                    </span>
-                    <span className="font-mono text-[10px] tracking-[0.14em] text-[#B8B8B8] uppercase">
-                      CREDENTIAL
-                    </span>
-                  </div>
+          {/* Timeline Items: Certifications */}
+          {(profile.certifications || [profile.certification]).map((cert, cIdx) => (
+            <div key={cert.provider + cIdx} className="edu-timeline-item relative">
+              <span
+                className="absolute -left-[25px] top-8 h-3 w-3 border-2 border-[#FF101A] bg-[#080808] shadow-[0_0_12px_rgba(255,16,26,0.9)] sm:-left-[34px]"
+                aria-hidden="true"
+              />
+              <TiltCard3D maxTilt={4}>
+                <article className="cr-card flex flex-col justify-between p-6 sm:p-8">
+                  <div>
+                    <div className="flex items-center justify-between border-b border-[#351010] pb-4">
+                      <span className="inline-flex items-center gap-2 font-mono text-xs tracking-[0.18em] text-[#FF101A] uppercase">
+                        <Award className="h-4 w-4" aria-hidden="true" />
+                        Certification
+                      </span>
+                      <span className="font-mono text-[10px] tracking-[0.14em] text-[#B8B8B8] uppercase">
+                        CREDENTIAL 0{cIdx + 1}
+                      </span>
+                    </div>
 
-                  <div className="mt-5 flex items-start justify-between gap-4">
-                    <div>
-                      <div className="font-mono text-xs tracking-[0.16em] text-[#FF101A] uppercase">
-                        {certification.provider}
+                    <div className="mt-5 flex items-start justify-between gap-4">
+                      <div>
+                        <div className="font-mono text-xs tracking-[0.16em] text-[#FF101A] uppercase">
+                          {cert.provider}
+                        </div>
+                        <h3 className="mt-1 font-display text-2xl font-bold text-white">
+                          {cert.title}
+                        </h3>
                       </div>
-                      <h3 className="mt-1 font-display text-2xl font-bold text-white">
-                        {certification.provider} — {certification.title}
-                      </h3>
+                      <div className="flex h-11 w-11 shrink-0 items-center justify-center border border-[#FF101A]/50 bg-[#080808] text-[#FF101A]">
+                        <ShieldCheck className="h-5 w-5" aria-hidden="true" />
+                      </div>
                     </div>
-                    <div className="flex h-11 w-11 shrink-0 items-center justify-center border border-[#FF101A]/50 bg-[#080808] text-[#FF101A]">
-                      <ShieldCheck className="h-5 w-5" aria-hidden="true" />
-                    </div>
+
+                    <p className="mt-3 text-sm leading-relaxed text-[#B8B8B8]">
+                      {cert.description}
+                    </p>
+
+                    {cert.certificateImageUrl && (
+                      <div className="mt-4 overflow-hidden border border-[#351010] bg-[#080808] p-2">
+                        <img
+                          src={cert.certificateImageUrl}
+                          alt={`${cert.provider} ${cert.title} certificate`}
+                          loading="lazy"
+                          className="max-h-48 w-full object-contain"
+                        />
+                      </div>
+                    )}
                   </div>
 
-                  <p className="mt-3 text-sm leading-relaxed text-[#B8B8B8]">
-                    {certification.description}
-                  </p>
-
-                  {certification.certificateImageUrl && (
-                    <div className="mt-4 overflow-hidden border border-[#351010] bg-[#080808] p-2">
-                      <img
-                        src={certification.certificateImageUrl}
-                        alt={`${certification.provider} ${certification.title} certificate`}
-                        loading="lazy"
-                        className="max-h-48 w-full object-contain"
-                      />
-                    </div>
-                  )}
-                </div>
-
-                <div className="mt-5 border-t border-[#351010] pt-4">
-                  {certification.verificationUrl ? (
-                    <a
-                      href={certification.verificationUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 border border-[#FF101A] bg-[#650000]/35 px-4 py-2 font-mono text-xs text-white transition-colors hover:bg-[#FF101A]"
-                    >
-                      <span>Verify Certificate</span>
-                      <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
-                    </a>
-                  ) : (
-                    <span className="font-mono text-[11px] text-[#B8B8B8]">
-                      {certification.credentialNote}
-                    </span>
-                  )}
-                </div>
-              </article>
-            </TiltCard3D>
-          </div>
+                  <div className="mt-5 border-t border-[#351010] pt-4">
+                    {cert.verificationUrl ? (
+                      <a
+                        href={cert.verificationUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 border border-[#FF101A] bg-[#650000]/35 px-4 py-2 font-mono text-xs text-white transition-colors hover:bg-[#FF101A]"
+                      >
+                        <span>Verify Certificate</span>
+                        <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+                      </a>
+                    ) : (
+                      <span className="font-mono text-[11px] text-[#B8B8B8]">
+                        {cert.credentialNote}
+                      </span>
+                    )}
+                  </div>
+                </article>
+              </TiltCard3D>
+            </div>
+          ))}
         </div>
       </div>
     </SectionTransition>

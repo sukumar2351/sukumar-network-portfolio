@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
-import { ArrowDownRight, ArrowRight } from 'lucide-react';
+import { ArrowDownRight, ArrowRight, FileText } from 'lucide-react';
 import { profile } from '../data/profile';
 import { AnimatedText } from '../components/AnimatedText';
 import { useReducedMotion } from '../hooks/useReducedMotion';
@@ -347,6 +347,16 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ ready = true }) => {
                   aria-hidden="true"
                 />
               </button>
+
+              <a
+                href={profile.contact.resumeUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-3d-dark group inline-flex items-center gap-2.5 px-6 py-4 font-mono text-xs font-semibold tracking-[0.18em] text-[#B8B8B8] transition-colors hover:border-[#FF101A] hover:text-white uppercase"
+              >
+                <FileText className="h-4 w-4 text-[#FF101A]" aria-hidden="true" />
+                <span>RESUME</span>
+              </a>
             </div>
 
             {/* Subtle Focus Metadata */}

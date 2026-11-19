@@ -31,7 +31,6 @@ export interface CertificationEntry {
 export interface ContactLinks {
   email: string;
   linkedinUrl: string;
-  githubUrl: string;
   resumeUrl: string;
   location: string;
 }
@@ -53,6 +52,7 @@ export interface ProfileConfig {
   portraitFallbackUrl: string;
   education: EducationEntry;
   certification: CertificationEntry;
+  certifications: CertificationEntry[];
   skills: SkillGroup[];
   projectsOverview: Array<{ id: string; title: string; summary: string }>;
   contact: ContactLinks;
@@ -93,23 +93,45 @@ export const profile: ProfileConfig = {
     "Interested in networking opportunities, technical discussions and new challenges? Let's connect.",
   footerTagline: 'Designed with curiosity. Built for connectivity.',
 
-  portraitCutoutUrl: '/images/profile-cutout.png',
-  portraitFallbackUrl: '/images/profile.png',
+  portraitCutoutUrl: '/images/profile-cutout.png?v=2',
+  portraitFallbackUrl: '/images/profile.png?v=2',
 
   education: {
     degree: 'Bachelor of Computer Applications (BCA)',
     institution: 'Krishna University',
     location: 'Machilipatnam, Andhra Pradesh',
+    period: '2023 – 2026 · Score: 73%',
   },
 
+  certifications: [
+    {
+      provider: 'Cisco Networking Academy',
+      title: 'Networking Academy Certification',
+      description:
+        'Practical computer networking certification covering IPv4/IPv6 addressing, subnetting, switching, VLANs, routing protocols, and hands-on lab configurations.',
+      certificateImageUrl: '',
+      verificationUrl: '',
+      credentialNote: 'Cisco Networking Academy Credential',
+    },
+    {
+      provider: 'Blue Teamers',
+      title: 'Networking Certification',
+      description:
+        'Foundational network engineering certification covering packet analysis, defense-in-depth networking, ACLs, and enterprise troubleshooting.',
+      certificateImageUrl: '',
+      verificationUrl: '',
+      credentialNote: 'Blue Teamers Credential',
+    },
+  ],
+
   certification: {
-    provider: 'Blue Teamers',
-    title: 'Networking Certification',
+    provider: 'Cisco Networking Academy & Blue Teamers',
+    title: 'Networking Certifications',
     description:
-      'Completed foundational networking certification covering network architecture, packet flow, protocols, and structured troubleshooting fundamentals.',
-    certificateImageUrl: '', // Add e.g. '/certificates/blue-teamers-networking.png'
-    verificationUrl: '', // Add official verification URL when available
-    credentialNote: 'Add your certificate image or verification URL in src/data/profile.ts',
+      'Certified in computer networking fundamentals, routing, switching, subnetting, and structured network diagnostics through Cisco Networking Academy and Blue Teamers.',
+    certificateImageUrl: '',
+    verificationUrl: '',
+    credentialNote: 'Cisco Networking Academy & Blue Teamers Certified',
   },
 
   skills: [
@@ -160,13 +182,12 @@ export const profile: ProfileConfig = {
   ],
 
   /**
-   * CONTACT DETAILS — REPLACE EMPTY STRINGS WITH YOUR REAL INFORMATION
+   * CONTACT DETAILS — ACTIVE REAL CONTACT INFORMATION
    */
   contact: {
-    email: '', // e.g. 'sukumar.karnam@example.com'
-    linkedinUrl: '', // e.g. 'https://www.linkedin.com/in/your-profile'
-    githubUrl: '', // e.g. 'https://github.com/your-username'
-    resumeUrl: '', // e.g. '/resume/Sukumar-Karnam-Resume.pdf'
-    location: 'Andhra Pradesh, India',
+    email: 'sukumarkarnam4@gmail.com',
+    linkedinUrl: 'https://www.linkedin.com/in/sukumar-karnam-595128313/',
+    resumeUrl: '/resume/Sukumar-Karnam-Resume.pdf',
+    location: 'Machilipatnam, Andhra Pradesh, India',
   },
 };

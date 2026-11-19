@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
-import { Menu, X } from 'lucide-react';
+import { FileText, Menu, X } from 'lucide-react';
 import { NavSectionId } from '../hooks/useScrollProgress';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 
@@ -108,6 +108,17 @@ export const Navbar: React.FC<NavbarProps> = ({
               </li>
             );
           })}
+          <li className="nav-item-3d ml-3">
+            <a
+              href="/resume/Sukumar-Karnam-Resume.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 border border-[#FF101A]/60 bg-[#FF101A]/10 px-3 py-1.5 font-mono text-xs font-semibold tracking-[0.14em] text-white transition-all hover:border-[#FF101A] hover:bg-[#FF101A] hover:text-white"
+            >
+              <FileText className="h-3.5 w-3.5 text-[#FF101A]" />
+              <span>RESUME</span>
+            </a>
+          </li>
         </ul>
 
         {/* Mobile Menu Button */}
@@ -151,6 +162,17 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </li>
               );
             })}
+            <li className="pt-2">
+              <a
+                href="/resume/Sukumar-Karnam-Resume.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 border border-[#FF101A] bg-[#FF101A]/15 px-3.5 py-2.5 font-mono text-xs font-semibold tracking-[0.16em] text-white uppercase transition-colors hover:bg-[#FF101A]"
+              >
+                <FileText className="h-3.5 w-3.5 text-[#FF101A]" />
+                <span>VIEW RESUME (PDF)</span>
+              </a>
+            </li>
           </ul>
         </div>
       )}

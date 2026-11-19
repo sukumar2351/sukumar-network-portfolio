@@ -6,7 +6,6 @@ import {
   Copy,
   ExternalLink,
   FileText,
-  Github,
   Linkedin,
   Mail,
 } from 'lucide-react';
@@ -55,6 +54,7 @@ export const ContactSection: React.FC = () => {
       label: 'Email',
       icon: Mail,
       value: contact.email,
+      displayValue: contact.email,
       href: contact.email ? `mailto:${contact.email}` : '',
       placeholder: 'Add your email in src/data/profile.ts',
       actionText: 'Send Email',
@@ -65,19 +65,10 @@ export const ContactSection: React.FC = () => {
       label: 'LinkedIn',
       icon: Linkedin,
       value: contact.linkedinUrl,
+      displayValue: 'in/sukumar-karnam-595128313',
       href: contact.linkedinUrl,
       placeholder: 'Add LinkedIn URL in src/data/profile.ts',
       actionText: 'Open Profile',
-      isExternal: true,
-    },
-    {
-      key: 'github',
-      label: 'GitHub',
-      icon: Github,
-      value: contact.githubUrl,
-      href: contact.githubUrl,
-      placeholder: 'Add GitHub URL in src/data/profile.ts',
-      actionText: 'View Repositories',
       isExternal: true,
     },
     {
@@ -85,6 +76,7 @@ export const ContactSection: React.FC = () => {
       label: 'Resume',
       icon: FileText,
       value: contact.resumeUrl,
+      displayValue: 'Sukumar-Karnam-Resume.pdf',
       href: contact.resumeUrl,
       placeholder: 'Add resume PDF link in src/data/profile.ts',
       actionText: 'View Resume',
@@ -94,7 +86,11 @@ export const ContactSection: React.FC = () => {
 
   const handleCopy = async (key: string, text: string) => {
     try {
-      await navigator.clipboard.writeText(text);
+      const copyVal =
+        key === 'resume' && text.startsWith('/')
+          ? `${window.location.origin}${text}`
+          : text;
+      await navigator.clipboard.writeText(copyVal);
       setCopiedKey(key);
       window.setTimeout(() => setCopiedKey(null), 1600);
     } catch {
@@ -147,6 +143,11 @@ export const ContactSection: React.FC = () => {
                             <div className="font-display text-base font-bold text-white">
                               {card.label}
                             </div>
+                            {configured && (
+                              <div className="mt-0.5 max-w-[210px] truncate font-mono text-[11px] text-[#FF101A] sm:max-w-[260px]">
+                                {card.displayValue}
+                              </div>
+                            )}
                           </div>
                         </div>
 
